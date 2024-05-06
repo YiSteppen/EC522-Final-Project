@@ -1,7 +1,7 @@
 ## EC530 Final Project
 ## Yi Shen
-
 ## Project:DIYML
+In this project, I build my DIYML database and call the database using the API. The vast majority of the framing has now been erected. Due to time(The rpc report duo on May 3 and a final exam on May 7), many details have not been perfected. I will continue to improve this project afterwards. If you find something that needs to be changed and improved, please let me know. You can email me(yishen@bu.edu). Thank you!
 
 ### Database:
 I use sqlite3 to build a database of DIYML. The structure of the result is shown in Fig 1
