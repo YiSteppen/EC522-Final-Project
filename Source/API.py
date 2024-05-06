@@ -193,9 +193,9 @@ class Training(Resource):
                 INSERT INTO training (data_id, training_points, training_parameters, training_result)
                 VALUES (?, ?, ?, ?)
             """, (data_id, training_points, training_parameters, training_result))
-            product_id = c.lastrowid
+            project_id = c.lastrowid
             conn.commit()
-            return {'message': 'Training data added successfully', 'product_id': product_id}, 201
+            return {'message': 'Training data added successfully', 'project_id': project_id}, 201
 
         except Exception as e:
             conn.rollback()
@@ -221,9 +221,9 @@ class Testing(Resource):
                 INSERT INTO testing (data_id, testing_result)
                 VALUES (?, ?)
             """, (data_id, testing_result))
-            product_id = c.lastrowid
+            project_id = c.lastrowid
             conn.commit()
-            return {'message': 'Testing data added successfully', 'product_id': product_id}, 201
+            return {'message': 'Testing data added successfully', 'project_id': project_id}, 201
 
         except Exception as e:
             conn.rollback()
@@ -233,16 +233,16 @@ class Testing(Resource):
             conn.close()
 
 class GetTrainingResult(Resource):
-    def get(self, product_id):
+    def get(self, project_id):
         conn = sqlite3.connect('projectdatabase.db')
         c = conn.cursor()
 
         try:
-            c.execute("SELECT * FROM training WHERE product_id = ?", (product_id,))
+            c.execute("SELECT * FROM training WHERE project_id = ?", (project_id,))
             result = c.fetchone()
             if result:
                 data = {
-                    'product_id': result[0],
+                    'project_id': result[0],
                     'data_id': result[1],
                     'training_points': result[2],
                     'training_parameters': result[3],
@@ -250,13 +250,13 @@ class GetTrainingResult(Resource):
                 }
                 return {'status': 'success', 'data': data}, 200
             else:
-                return {'status': 'error', 'message': 'No training record found with the provided product_id'}, 404
+                return {'status': 'error', 'message': 'No training record found with the provided project_id'}, 404
 
         finally:
             conn.close()
 
 class UpdateTrainingParameters(Resource):
-    def put(self, product_id):
+    def put(self, project_id):
         conn = sqlite3.connect('projectdatabase.db')
         c = conn.cursor()
         
@@ -267,7 +267,7 @@ class UpdateTrainingParameters(Resource):
             
             if updated_parameters:
                 # Update the training parameters in the database
-                c.execute("UPDATE training SET training_parameters = ? WHERE product_id = ?", (updated_parameters, product_id))
+                c.execute("UPDATE training SET training_parameters = ? WHERE project_id = ?", (updated_parameters, project_id))
                 conn.commit()
                 
                 return {'status': 'success', 'message': 'Training parameters updated successfully'}, 200
@@ -282,38 +282,38 @@ class UpdateTrainingParameters(Resource):
             conn.close()
 
 class GetTestingResult(Resource):
-    def get(self, product_id):
+    def get(self, project_id):
         conn = sqlite3.connect('projectdatabase.db')
         c = conn.cursor()
 
         try:
-            c.execute("SELECT * FROM testing WHERE product_id = ?", (product_id,))
+            c.execute("SELECT * FROM testing WHERE project_id = ?", (project_id,))
             result = c.fetchone()
             if result:
                 data = {
-                    'product_id': result[0],
+                    'project_id': result[0],
                     'data_id': result[1],
                     'testing_result': result[2]
                 }
                 return {'status': 'success', 'data': data}, 200
             else:
-                return {'status': 'error', 'message': 'No testing record found with the provided product_id'}, 404
+                return {'status': 'error', 'message': 'No testing record found with the provided project_id'}, 404
 
         finally:
             conn.close()
 
 class AnalyseResults(Resource):
-    def post(self, product_id):
+    def post(self, project_id):
         conn = sqlite3.connect('projectdatabase.db')
         c = conn.cursor()
 
         try:
-            # Fetch results for training and testing based on product_id
-            c.execute("SELECT training_result FROM training WHERE product_id = ?", (product_id,))
+            # Fetch results for training and testing based on project_id
+            c.execute("SELECT training_result FROM training WHERE project_id = ?", (project_id,))
             training_result_row = c.fetchone()
             training_result = training_result_row[0] if training_result_row else "No training result"
 
-            c.execute("SELECT testing_result FROM testing WHERE product_id = ?", (product_id,))
+            c.execute("SELECT testing_result FROM testing WHERE project_id = ?", (project_id,))
             testing_result_row = c.fetchone()
             test_result = testing_result_row[0] if testing_result_row else "No testing result"
 
@@ -322,9 +322,9 @@ class AnalyseResults(Resource):
 
             # Insert the analysis result into the database
             c.execute("""
-                INSERT INTO analysis (product_id, training_result, test_result, ana_result)
+                INSERT INTO analysis (project_id, training_result, test_result, ana_result)
                 VALUES (?, ?, ?, ?)
-            """, (product_id, training_result, test_result, analysis_result))
+            """, (project_id, training_result, test_result, analysis_result))
             conn.commit()
 
             # Return the analysis result
@@ -332,7 +332,7 @@ class AnalyseResults(Resource):
 
         except sqlite3.IntegrityError:
             conn.rollback()
-            return {'error': 'Integrity error, possibly duplicate product_id'}, 409
+            return {'error': 'Integrity error, possibly duplicate project_id'}, 409
 
         except Exception as e:
             conn.rollback()
@@ -470,10 +470,10 @@ api.add_resource(DeleteData, '/delete_data/<int:data_id>')
 api.add_resource(DeleteUser, '/delete_user/<int:user_id>')
 api.add_resource(GetPublishedResults, '/publish', '/publish/<int:user_id>', '/publish/<int:user_id>/<int:project_id>')
 api.add_resource(Publishing, '/publish')
-api.add_resource(UpdateTrainingParameters, '/update_training_parameters/<int:product_id>')
-api.add_resource(AnalyseResults, '/analyse_results/<int:product_id>')
-api.add_resource(GetTrainingResult, '/get_training/<int:product_id>')
-api.add_resource(GetTestingResult, '/get_testing/<int:product_id>')
+api.add_resource(UpdateTrainingParameters, '/update_training_parameters/<int:project_id>')
+api.add_resource(AnalyseResults, '/analyse_results/<int:project_id>')
+api.add_resource(GetTrainingResult, '/get_training/<int:project_id>')
+api.add_resource(GetTestingResult, '/get_testing/<int:project_id>')
 api.add_resource(User, '/user')
 api.add_resource(GetUser, '/user/<int:user_id>')
 api.add_resource(CreateAuthUser, '/create_auth')
