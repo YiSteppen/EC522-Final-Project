@@ -84,7 +84,7 @@ The provided Python script in unit_test.py is a set of pytest tests designed to 
 3. test_post_user_already_exists: Tries to create a duplicate user to test handling of conflicts. It expects a conflict response (HTTP 409) and checks for an 'error' message, indicating that the user already exists.
 4. test_sql_injection_attempt_1 and test_sql_injection_attempt_2: These tests attempt to inject SQL commands to test the application’s vulnerability to SQL injection attacks. Both tests are designed to provoke an error response, check
 <div align=center>
-<img src="pytest result.jpg" width="80%">
+<img src="Pytest result.jpg" width="80%">
 
 Fig 2  Unit test result
 </div>
@@ -93,7 +93,7 @@ Fig 2  Unit test result
 Packaged and ready to install and run with docker. I run the pytest as a test of Docker.
 
 <div align=center>
-<img src="docker result.png" width="80%">
+<img src="Docker result.png" width="80%">
 
 Fig 3  Unit test result
 </div>
